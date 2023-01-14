@@ -1,0 +1,33 @@
+Parse the command-line arguments. You will need to extract the values of file1, cmd1, cmd2, cmd3, ... cmdn, and file2 from the arguments passed to the pipex program.
+You should also check if the first argument is here_doc and, if it is, extract the LIMITER string as the second argument.
+
+If the first argument is here_doc, read from the standard input until you encounter the LIMITER string.
+You can use the getline function to read a line at a time and check if it matches the LIMITER string.
+
+Create a temporary file to hold the input read from the standard input. You can use the tmpfile function to create a temporary file.
+
+If the first argument is not here_doc, open file1 for reading.
+
+Open file2 for writing.
+
+Create a pipe using the pipe function. This will allow you to communicate between the two processes that you will create using the fork function.
+
+Create the first child process using the fork function. In the child process, you will need to:
+
+Close the read end of the pipe (since the child will be writing to the pipe).
+If the first argument is here_doc, redirect the standard input of the child process to the temporary file using the dup2 function.
+If the first argument is not here_doc, redirect the standard input of the child process to file1 using the dup2 function.
+Execute cmd1 using the execve function.
+In the parent process, create the second child process using the fork function. In the second child process, you will need to:
+Close the write end of the pipe (since the child will be reading from the pipe).
+Redirect the standard output of the child process to file2 using the dup2 function.
+Execute cmd2 using the execve function.
+If there are more commands (cmd3, cmd4, ... cmdn), repeat steps 7 and 8 for each additional command, using a new pipe for each command.
+
+In the parent process, wait for the last child process to complete using the waitpid function.
+
+Close the pipe file descriptors and the file descriptors for file1, the temporary file, and file2.
+
+If the first argument is here_doc, delete the temporary file.
+
+Return from the main function.
